@@ -1,4 +1,7 @@
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 namespace puzzle {
 	namespace input {
@@ -22,6 +25,41 @@ skipread:			switch (character) {
 					case ' ': continue;
 				}
 			}
+			return result;
+		}
+
+		inline std::string importFile(const char* filename) {
+			std::ifstream input(filename);
+			std::ostringstream stringStream;
+			stringStream << input.rdbuf();
+			input.close();
+			return stringStream.str();
+		}
+
+	}
+
+	namespace string {
+		inline std::vector<std::string> split(const std::string& string, char delimiter) {
+			std::vector<std::string> result;
+			size_t sectionStart = 0;
+			for (size_t i = 0; i < string.size(); i++) {
+skipinc:			if (string[i] == delimiter) { result.push_back(string.substr(sectionStart, i - sectionStart)); sectionStart = ++i; goto skipinc; }
+			}
+			result.push_back(string.substr(sectionStart));
+			return result;
+		}
+
+		inline std::vector<std::string> split(const std::string& string, const std::string& delimiter) {
+			std::vector<std::string> result;
+			size_t sectionStart = 0;
+			for (size_t i = 0; i < string.size(); i++) {
+skipinc:			size_t delimIndex = string.find(delimiter, sectionStart);
+				if (delimIndex == std::string::npos) { break; }
+				result.push_back(string.substr(sectionStart, i - sectionStart));
+				if ((sectionStart = i += delimiter.size()) == string.size()) { break; }
+				goto skipinc;
+			}
+			result.push_back(string.substr(sectionStart));
 			return result;
 		}
 	}
