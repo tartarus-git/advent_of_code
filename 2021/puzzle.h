@@ -42,8 +42,9 @@ skipread:			switch (character) {
 		inline std::vector<std::string> split(const std::string& string, char delimiter) {
 			std::vector<std::string> result;
 			size_t sectionStart = 0;
-			for (size_t i = 0; i < string.size(); i++) {
-skipinc:			if (string[i] == delimiter) { result.push_back(string.substr(sectionStart, i - sectionStart)); sectionStart = ++i; goto skipinc; }
+			for (size_t i = 0; i < string.length(); ) {
+				if (string[i] == delimiter) { result.push_back(string.substr(sectionStart, i - sectionStart)); sectionStart = ++i; continue; }
+				i++;
 			}
 			result.push_back(string.substr(sectionStart));
 			return result;
@@ -52,12 +53,11 @@ skipinc:			if (string[i] == delimiter) { result.push_back(string.substr(sectionS
 		inline std::vector<std::string> split(const std::string& string, const std::string& delimiter) {
 			std::vector<std::string> result;
 			size_t sectionStart = 0;
-			for (size_t i = 0; i < string.size(); i++) {
-skipinc:			size_t delimIndex = string.find(delimiter, sectionStart);
+			while (true) {
+				size_t delimIndex = string.find(delimiter, sectionStart);
 				if (delimIndex == std::string::npos) { break; }
-				result.push_back(string.substr(sectionStart, i - sectionStart));
-				if ((sectionStart = i += delimiter.size()) == string.size()) { break; }
-				goto skipinc;
+				result.push_back(string.substr(sectionStart, delimIndex - sectionStart));
+				sectionStart = delimIndex + delimiter.size();
 			}
 			result.push_back(string.substr(sectionStart));
 			return result;
