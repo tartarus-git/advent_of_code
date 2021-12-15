@@ -5,6 +5,11 @@
 #include <fstream>
 #include <sstream>
 
+#define ASCII_NUM_BEGIN 48
+#define ASCII_NUM_END 57
+
+#define INVALID_INPUT_CHAR 255
+
 namespace puzzle {
 	namespace input {
 		inline std::vector<unsigned long long> parseList(std::istream& source) {
@@ -63,6 +68,44 @@ skipread:			switch (character) {
 			}
 			result.push_back(string.substr(sectionStart));
 			return result;
+		}
+
+		inline std::vector<std::string> removeEmptyStrings(const std::vector<std::string>& strings) {
+			std::vector<std::string> result;
+			result.reserve(strings.size());
+			for (int i = 0; i < strings.size(); i++) {
+				if (strings[i].length() == 0) { continue; }
+				result.push_back(strings[i]);
+			}
+			result.shrink_to_fit();
+			return result;
+		}
+
+		bool conversionerr = false;					// Signals conversion error. When handling this, user manually sets it back to true.
+
+		inline unsigned long long convertToUInt64(const std::string& string) {
+			unsigned long long result = 0;
+			for (int i = 0; i < string.length(); i++) {
+				switch (string[i]) {
+					case '0': result = result * 10; continue;
+					case '1': result = result * 10 + 1; continue;
+					case '2': result = result * 10 + 2; continue;
+					case '3': result = result * 10 + 3; continue;
+					case '4': result = result * 10 + 4; continue;
+					case '5': result = result * 10 + 5; continue;
+					case '6': result = result * 10 + 6; continue;
+					case '7': result = result * 10 + 7; continue;
+					case '8': result = result * 10 + 8; continue;
+					case '9': result = result * 10 + 9; continue;
+					default: conversionerr = true; return 0;
+				}
+			}
+			return result;
+		}
+
+		inline char convertToByte(char character) {
+			if (character >= ASCII_NUM_BEGIN && character <= ASCII_NUM_END) { return character - ASCII_NUM_BEGIN; }
+			return INVALID_INPUT_CHAR;
 		}
 	}
 }
