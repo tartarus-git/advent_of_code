@@ -34,11 +34,11 @@ std::string subSigs(const std::string& a, const std::string& b) {
 	return result;
 }
 
-bool sigContains(const std::string& a, const std::string& b) {
+bool sigContains(const std::string& b, const std::string& a) {
 	unsigned int found = 0;
 	for (int i = 0; i < a.size(); i++) {
 		for (int j = 0; j < b.size(); j++) {
-			if (a[i] == b[i]) { found++; }
+			if (a[i] == b[j]) { found++; }
 		}
 	}
 	if (found == a.size()) { return true; }
@@ -106,6 +106,7 @@ int main() {
 					continue;
 			}
 		}
+		std::cout << num << std::endl;
 		totalNum += num;
 	}
 
