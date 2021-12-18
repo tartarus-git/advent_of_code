@@ -1,33 +1,29 @@
 #include "../puzzle.h"
 
+#include <bits/stdc++.h>
 #include <iostream>
-#include <tuple>
+
+puzzle::data::Matrix<unsigned long long> field;
+
+unsigned long long fill(size_t x, size_t y) {
+	field[x][y] = 9;
+	unsigned long long amountFilled = 1;
+	if (field.contains(x + 1, y) && field[x + 1][y] != 9) { amountFilled += fill(x + 1, y); }
+	if (field.contains(x - 1, y) && field[x - 1][y] != 9) { amountFilled += fill(x - 1, y); }
+	if (field.contains(x, y + 1) && field[x][y + 1] != 9) { amountFilled += fill(x, y + 1); }
+	if (field.contains(x, y - 1) && field[x][y - 1] != 9) { amountFilled += fill(x, y - 1); }
+	return amountFilled;
+}
 
 int main() {
 	std::string input = puzzle::input::importFile("input.data");
 	std::vector<std::string> lines = puzzle::string::removeEmptyStrings(puzzle::string::split(input, '\n'));
-	size_t width = lines[0].length();
-	size_t height = lines.size();
-	size_t map_len = height * width;
-	unsigned long long* map = new unsigned long long[map_len];
-	for (int x = 0; x < width; x++) { for (int y = 0; y < height; y++) { map[y * width + x] = lines[y][x] - ASCII_NUM_BEGIN; } }
+	field = puzzle::data::Matrix<unsigned long long>(lines[0].length(), lines.size());
+	for (int y = 0; y < field.height(); y++) { for (int x = 0; x < field.width(); x++) { field[x][y] = lines[y][x] - ASCII_NUM_BEGIN; } }
 
-	for (int i = 0; i < map_len; i++) { if (map[i] == 9) { map[i] = 0; } }
+	std::vector<unsigned long long> basins;
+	for (int i = 0; i < field.width() * field.height(); i++) { if (field.data()[i] != 9) { basins.push_back(fill(i % field.width(), i / field.width())); } }
+	std::sort(basins.begin(), basins.end());
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			unsigned long long* value = map + (y * width + x);
-			unsigned long long* right = value + 1;
-			unsigned long long* left = value - 1;
-			unsigned long long* top = value - width;
-			unsigned long long* bottom = value + width;
-			if (*value == 0) { continue; }
-			if (x > 0 && *left != 0) {
-				*value = *left;
-			}
-			if (y > 0 && *top != 0) {
-		}
-	}
-
-	delete[] map;
+	std::cout << basins[basins.size() - 1] * basins[basins.size() - 2] * basins[basins.size() - 3] << std::endl;
 }
