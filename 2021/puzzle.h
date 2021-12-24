@@ -156,6 +156,10 @@ skipread:			switch (character) {
 				size_t width;
 				size_t xIndex;
 
+				// NOTE: I don't remember too much about what I wrote above, but what I can tell you about this is that without this defaulted constructor,
+				// The Matrix() = default constructor wouldn't get generated because it would be malformed. Thats because C++ wants to default initialize
+				// everything for some reason, and it complains if it can't. To make this work out, we have to give C++ a way to default initialize MatrixColumn,
+				// which is what were doing here.
 				MatrixColumn() = default;		// This is sort of a POD type because this is trivially constructable. At least I think that's why.
 				MatrixColumn(size_t width) : width(width) { }
 			public:
