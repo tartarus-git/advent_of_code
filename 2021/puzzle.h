@@ -112,6 +112,16 @@ skipread:			switch (character) {
 	}
 
 	namespace data {
+		template <typename T>
+		class Vector {
+		public:
+			T x, y;
+
+			Vector() = default;
+			Vector(T x, T y) : x(x), y(y) { }
+
+			explicit operator Vector<size_t>() const noexcept { return Vector<size_t>(x, y); }
+		};
 
 		template <typename T>
 		class Matrix {
@@ -164,6 +174,8 @@ skipread:			switch (character) {
 				MatrixColumn(size_t width) : width(width) { }
 			public:
 				T& operator[](size_t yIndex) const { return data[yIndex * width + xIndex]; }
+
+				operator T&() const noexcept { return data[xIndex]; }
 			} xIndexReturn;
 
 			Matrix() = default;	// NOTE: Doesn't do anything in this case because all member variables are POD-types (almost, triv. ctor = most important)
@@ -194,9 +206,14 @@ skipread:			switch (character) {
 			size_t height() const { return heightInner; }
 
 			// NOTE: This const is good because const-correctness, but also necessary cuz or else you can't call this function on a const instance of class.
-			MatrixColumn& operator[](size_t xIndex) { xIndexReturn.xIndex = xIndex; return xIndexReturn; }
+			// TODO: The above note doesn't make sense, but only because you should have a const here and you don't. Make this create a new MatrixColumn and return it. Just thought about it some more, maybe that isn't such a great idea, think about it.
+			const MatrixColumn& operator[](size_t xIndex) { xIndexReturn.xIndex = xIndex; return xIndexReturn; }
+			T& operator[](const Vector<size_t>& index) const { return xIndexReturn.data[index.y * xIndexReturn.width + index.x]; }
 
 			bool contains(size_t x, size_t y) { return x < xIndexReturn.width && x >= 0 && y < heightInner && y >= 0; }
+			bool contains(Vector<size_t> point) { return contains(point.x, point.y); }
+
+			Vector<size_t> toPoint(size_t index) { return Vector<size_t>(index % xIndexReturn.width, index / xIndexReturn.width); }
 
 			// Note: This has nothing to do with codebase, putting it in anyway:
 			// In the past, you've cached referenced parameters because you assumed the compiler was using pointers behind the scenes.
